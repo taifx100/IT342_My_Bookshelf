@@ -1,0 +1,7 @@
+/build
+
+.idea/
+.kotlin/
+.gradle/
+**/build/
+app/google-services.json
