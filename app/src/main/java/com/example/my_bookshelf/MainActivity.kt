@@ -1,3 +1,4 @@
+
 package com.example.my_bookshelf
 
 import android.os.Bundle
@@ -38,7 +39,8 @@ class MainActivity : ComponentActivity() {
             // Handle Android back button
             BackHandler(
                 enabled = currentScreen == "details" ||
-                        currentScreen == "signup"
+                        currentScreen == "signup" ||
+                        currentScreen == "edit"
             ) {
                 when (currentScreen) {
                     "details" -> {
@@ -48,6 +50,10 @@ class MainActivity : ComponentActivity() {
 
                     "signup" -> {
                         currentScreen = "login"
+                    }
+
+                    "edit" -> {
+                        currentScreen = "details"
                     }
                 }
             }
@@ -139,11 +145,7 @@ class MainActivity : ComponentActivity() {
                                     },
 
                                     onEdit = {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Edit Book page is coming soon!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        currentScreen = "edit"
                                     },
 
                                     onDelete = {
@@ -152,6 +154,33 @@ class MainActivity : ComponentActivity() {
                                             "Delete will be available after Firestore integration.",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                    }
+                                )
+
+                            } else {
+                                LaunchedEffect(Unit) {
+                                    currentScreen = "home"
+                                }
+                            }
+                        }
+
+                        // EDIT BOOK
+                        "edit" -> {
+
+                            val book = selectedBook
+
+                            if (book != null) {
+
+                                EditBookScreen(
+                                    book = book,
+
+                                    onSave = { updatedBook ->
+                                        selectedBook = updatedBook
+                                        currentScreen = "details"
+                                    },
+
+                                    onCancel = {
+                                        currentScreen = "details"
                                     }
                                 )
 
