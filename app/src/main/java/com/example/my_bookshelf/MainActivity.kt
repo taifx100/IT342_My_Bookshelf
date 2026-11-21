@@ -1,11 +1,10 @@
-
 package com.example.my_bookshelf
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,30 +31,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            var selectedBook by remember {
-                mutableStateOf<Book?>(null)
-            }
-
-            // Handle Android back button
+            // Temporary navigation until Shaden adds BookDetailsScreen
             BackHandler(
-                enabled = currentScreen == "details" ||
-                        currentScreen == "signup" ||
-                        currentScreen == "edit"
+                enabled = currentScreen == "signup"
             ) {
-                when (currentScreen) {
-                    "details" -> {
-                        selectedBook = null
-                        currentScreen = "home"
-                    }
-
-                    "signup" -> {
-                        currentScreen = "login"
-                    }
-
-                    "edit" -> {
-                        currentScreen = "details"
-                    }
-                }
+                currentScreen = "login"
             }
 
             My_BookshelfTheme {
@@ -72,7 +52,6 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(
                                 repository = repository,
                                 onLoginSuccess = {
-                                    selectedBook = null
                                     currentScreen = "home"
                                 },
                                 onCreateAccountClick = {
@@ -86,7 +65,6 @@ class MainActivity : ComponentActivity() {
                             SignUpScreen(
                                 repository = repository,
                                 onSignUpSuccess = {
-                                    selectedBook = null
                                     currentScreen = "home"
                                 },
                                 onLoginClick = {
@@ -108,9 +86,12 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 userName = userName,
 
-                                onBookClick = { book ->
-                                    selectedBook = book
-                                    currentScreen = "details"
+                                onBookClick = {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "Book Details page is coming soon!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 },
 
                                 onAddBookClick = {
@@ -123,72 +104,9 @@ class MainActivity : ComponentActivity() {
 
                                 onSignOut = {
                                     repository.signOut()
-                                    selectedBook = null
                                     currentScreen = "login"
                                 }
                             )
-                        }
-
-                        // BOOK DETAILS
-                        "details" -> {
-
-                            val book = selectedBook
-
-                            if (book != null) {
-
-                                BookDetailsScreen(
-                                    book = book,
-
-                                    onBack = {
-                                        selectedBook = null
-                                        currentScreen = "home"
-                                    },
-
-                                    onEdit = {
-                                        currentScreen = "edit"
-                                    },
-
-                                    onDelete = {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            "Delete will be available after Firestore integration.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                )
-
-                            } else {
-                                LaunchedEffect(Unit) {
-                                    currentScreen = "home"
-                                }
-                            }
-                        }
-
-                        // EDIT BOOK
-                        "edit" -> {
-
-                            val book = selectedBook
-
-                            if (book != null) {
-
-                                EditBookScreen(
-                                    book = book,
-
-                                    onSave = { updatedBook ->
-                                        selectedBook = updatedBook
-                                        currentScreen = "details"
-                                    },
-
-                                    onCancel = {
-                                        currentScreen = "details"
-                                    }
-                                )
-
-                            } else {
-                                LaunchedEffect(Unit) {
-                                    currentScreen = "home"
-                                }
-                            }
                         }
                     }
                 }
