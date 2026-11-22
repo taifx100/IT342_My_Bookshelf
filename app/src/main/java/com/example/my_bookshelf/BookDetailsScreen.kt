@@ -1,11 +1,15 @@
 package com.example.my_bookshelf
 
+import android.widget.Space
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -16,12 +20,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.my_bookshelf.ui.theme.*
 import androidx.compose.ui.tooling.preview.Preview
-
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 @Composable
 fun BookDetailsScreen(
     book: Book,
     onBack: () -> Unit
 ) {
+    //val covercolors changes based on a book cover color
+    val coverColors = when (book.coverColor) {
+        "sand" -> listOf(CoverSandLight, CoverSand)
+        "navy" -> listOf(CoverNavyLight, CoverNavy)
+        else -> listOf(CoverSageLight, CoverSage)
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -31,7 +47,8 @@ fun BookDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
-                .padding(top = 40.dp)
+                .padding(top = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //At the top
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -55,6 +72,20 @@ fun BookDetailsScreen(
                     color = Coffee,
                     modifier = Modifier.align(Alignment.Center)
                 )
+            }
+            Spacer(Modifier.height(24.dp))
+            //book cover box
+            Box(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(265.dp)
+                    .shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Brush.verticalGradient(coverColors))
+            ) {
             }
         }
     }
