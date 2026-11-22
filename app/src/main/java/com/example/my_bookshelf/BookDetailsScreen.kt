@@ -27,6 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.text.style.TextAlign
 @Composable
 fun BookDetailsScreen(
     book: Book,
@@ -38,6 +40,12 @@ fun BookDetailsScreen(
         "navy" -> listOf(CoverNavyLight, CoverNavy)
         else -> listOf(CoverSageLight, CoverSage)
     }
+    //val titleColor changes based on book cover color,
+    //to be in contrast with it
+    val titleColor =
+        if (book.coverColor == "sand") Coffee
+        else PureWhite
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,6 +94,27 @@ fun BookDetailsScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.verticalGradient(coverColors))
             ) {
+                Text(
+                    text = book.title,
+                    fontFamily = AmiriFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 25.sp,
+                    lineHeight = 32.sp,
+                    color = titleColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(18.dp)
+                )
+                // Extra: thin dark strip on the right side of the cover,
+                // like a book spine
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .width(8.dp)
+                        .background(SpineShade)
+                )
             }
         }
     }
