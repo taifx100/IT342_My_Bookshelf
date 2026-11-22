@@ -1,61 +1,51 @@
+
 package com.example.my_bookshelf
 
-import android.widget.Space
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.my_bookshelf.ui.theme.*
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import coil3.compose.AsyncImage
+import com.example.my_bookshelf.ui.theme.*
+
 @Composable
 fun BookDetailsScreen(
     book: Book,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onEdit: () -> Unit = {},    // empty for now
+    onDelete: () -> Unit = {}   // empty for now
 ) {
-    //val covercolors changes based on a book cover color
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // true if the cover image link failed to load,
+    // then we show the colored cover instead
+    var imageFailed by remember(book.coverUrl) { mutableStateOf(false) }
+    val showImage = book.coverUrl.isNotBlank() && !imageFailed
+
+    // coverColors changes based on the book cover color
     val coverColors = when (book.coverColor) {
         "sand" -> listOf(CoverSandLight, CoverSand)
         "navy" -> listOf(CoverNavyLight, CoverNavy)
         else -> listOf(CoverSageLight, CoverSage)
     }
-    //val titleColor changes based on book cover color,
-    //to be in contrast with it
+
+    // titleColor changes based on the book cover color,
+    // to be in contrast with it
     val titleColor =
         if (book.coverColor == "sand") Coffee
         else PureWhite
@@ -65,15 +55,15 @@ fun BookDetailsScreen(
             .fillMaxSize()
             .background(Paper)
     ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 40.dp, bottom = 36.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-            //At the top
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(top = 40.dp, bottom = 36.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // At the top
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextButton(
                     onClick = onBack,
@@ -96,8 +86,10 @@ fun BookDetailsScreen(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
             Spacer(Modifier.height(24.dp))
-            //book cover box
+
+            // Book cover box
             Box(
                 modifier = Modifier
                     .width(200.dp)
@@ -109,20 +101,32 @@ fun BookDetailsScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Brush.verticalGradient(coverColors))
             ) {
-                Text(
-                    text = book.title,
-                    fontFamily = AmiriFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 25.sp,
-                    lineHeight = 32.sp,
-                    color = titleColor,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(18.dp)
-                )
-                // Extra: thin dark strip on the right side of the cover,
-                // like a book spine
+                if (showImage) {
+                    // real cover image from the link
+                    AsyncImage(
+                        model = book.coverUrl,
+                        contentDescription = book.title,
+                        contentScale = ContentScale.Crop,
+                        onError = { imageFailed = true },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    //when no image: colored cover with the title
+                    Text(
+                        text = book.title,
+                        fontFamily = AmiriFont,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp,
+                        lineHeight = 32.sp,
+                        color = titleColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(18.dp)
+                    )
+                }
+
+                // thin dark strip on the right side of the cover, like a book spine
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
@@ -131,8 +135,10 @@ fun BookDetailsScreen(
                         .background(SpineShade)
                 )
             }
+
             Spacer(Modifier.height(25.dp))
-            //Book title
+
+            // Book title
             Text(
                 text = book.title,
                 fontFamily = AmiriFont,
@@ -142,73 +148,155 @@ fun BookDetailsScreen(
                 color = Coffee,
                 textAlign = TextAlign.Center
             )
+
             Spacer(Modifier.height(6.dp))
-            //Author name
+
+            // Author name
             Text(
-                text =book.author,
+                text = book.author,
                 fontFamily = CairoFont,
                 fontSize = 15.sp,
                 color = TextMuted,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(6.dp))
-            //two chips, one function
-            //Reuse function DetailsChip
+
+            Spacer(Modifier.height(16.dp))
+
+            // Two chips, one function
+            // DetailsChip is reused for year and category
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                DetailsChip(text = book.year.toString())//call fun and pass year
-                DetailsChip(text = book.category)//call it again and pass category
-          }
-                Spacer(Modifier.height(28.dp))
+                DetailsChip(text = book.year.toString())
+                DetailsChip(text = book.category)
+            }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth() //To fits all different devices screens
-                        .shadow(3.dp, RoundedCornerShape(22.dp))
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(PureWhite)
-                        .padding(22.dp)
-                ) {
-                    Text(
-                        text = "About this book",
-                        fontFamily = FrauncesFont,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 21.sp,
-                        color = Coffee
-                    )
+            Spacer(Modifier.height(28.dp))
 
-                    Spacer(Modifier.height(14.dp))
+            // "About this book" card
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth() // to fit all different device screens
+                    .shadow(3.dp, RoundedCornerShape(22.dp))
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(PureWhite)
+                    .padding(22.dp)
+            ) {
+                Text(
+                    text = "About this book",
+                    fontFamily = FrauncesFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 21.sp,
+                    color = Coffee
+                )
 
-                    Text(
-                        text = book.description,
-                        fontFamily = CairoFont,
-                        fontSize = 15.sp,
-                        lineHeight = 28.sp,
-                        color = TextSoft,
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                Spacer(Modifier.height(14.dp))
+
+                Text(
+                    text = book.description,
+                    fontFamily = CairoFont,
+                    fontSize = 15.sp,
+                    lineHeight = 28.sp,
+                    color = TextSoft,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // Edit button
+            Button(
+                onClick = onEdit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MochaDark,
+                    contentColor = PureWhite
+                )
+            ) {
+                Text(
+                    text = "Edit book",
+                    fontFamily = DMSansFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Delete button
+            OutlinedButton(
+                onClick = { showDeleteDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(18.dp),
+                border = BorderStroke(1.dp, ErrorRed),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed)
+            ) {
+                Text(
+                    text = "Delete book",
+                    fontFamily = DMSansFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+            }
         }
     }
-}
-@Composable private fun DetailsChip(text: String){
-Box(
-    modifier = Modifier
-        .clip(RoundedCornerShape(50))
-        .background(ChipBackground)
-        .padding(horizontal = 14.dp, vertical = 7.dp))
-{
-    Text(
-        text = text,
-        fontFamily = CairoFont,
-        fontSize = 12.sp,
-        color = LinkBrown
-    )}
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = {
+                Text("Delete this book?", fontFamily = FrauncesFont, color = Coffee)
+            },
+            text = {
+                Text(
+                    "Are you sure you want to remove this book from your shelf?",
+                    fontFamily = DMSansFont,
+                    color = TextSoft
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    }
+                ) { Text("Delete", color = ErrorRed) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel", color = LinkBrown)
+                }
+            },
+            containerColor = PureWhite,
+            shape = RoundedCornerShape(24.dp)
+        )
+    }
 }
 
-//Preview (private fun so it won't mess up the other screens' preview)
+@Composable
+private fun DetailsChip(text: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(ChipBackground)
+            .padding(horizontal = 14.dp, vertical = 7.dp)
+    ) {
+        Text(
+            text = text,
+            fontFamily = CairoFont,
+            fontSize = 12.sp,
+            color = LinkBrown
+        )
+    }
+}
+
+// Preview (private so it won't mess up the other screens' previews)
 @Preview(showBackground = true)
 @Composable
 private fun BookDetailsScreenPreview() {
