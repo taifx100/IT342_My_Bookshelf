@@ -28,7 +28,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 @Composable
 fun BookDetailsScreen(
     book: Book,
@@ -116,11 +127,53 @@ fun BookDetailsScreen(
                         .background(SpineShade)
                 )
             }
-            //Book title and author name
-            
+            Spacer(Modifier.height(25.dp))
+            //Book title
+            Text(
+                text = book.title,
+                fontFamily = AmiriFont,
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp,
+                lineHeight = 36.sp,
+                color = Coffee,
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.height(6.dp))
+            //Author name
+            Text(
+                text =book.author,
+                fontFamily = CairoFont,
+                fontSize = 15.sp,
+                color = TextMuted,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            //two chips, one function
+            //Reuse function DetailsChip
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                DetailsChip(text = book.year.toString())//call fun and pass year
+                DetailsChip(text = book.category)//call it again and pass category
+            }
         }
     }
 }
+@Composable private fun DetailsChip(text: String){
+Box(
+    modifier = Modifier
+        .clip(RoundedCornerShape(50))
+        .background(ChipBackground)
+        .padding(horizontal = 14.dp, vertical = 7.dp))
+{
+    Text(
+        text = text,
+        fontFamily = CairoFont,
+        fontSize = 12.sp,
+        color = LinkBrown
+    )}
+}
+
 //Preview (private fun so it won't mess up the other screens' preview)
 @Preview(showBackground = true)
 @Composable
