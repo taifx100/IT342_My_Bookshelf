@@ -30,12 +30,19 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+            //Change 1
+            //save the selected book
+            var selectedBook by remember { mutableStateOf<Book?>(null) }
 
             // Temporary navigation until Shaden adds BookDetailsScreen
             BackHandler(
                 enabled = currentScreen == "signup"
             ) {
                 currentScreen = "login"
+            }
+            //Back from Details to Home screen
+            BackHandler(enabled = currentScreen == "details") {
+                currentScreen = "home"
             }
 
             My_BookshelfTheme {
@@ -86,12 +93,9 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 userName = userName,
 
-                                onBookClick = {
-                                    Toast.makeText(
-                                        this@MainActivity,
-                                        "Book Details page is coming soon!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                onBookClick = { book ->
+                                    selectedBook = book
+                                    currentScreen = "details"
                                 },
 
                                 onAddBookClick = {
@@ -107,6 +111,14 @@ class MainActivity : ComponentActivity() {
                                     currentScreen = "login"
                                 }
                             )
+                        }
+                        "details" -> {
+                            selectedBook?.let { book ->
+                                BookDetailsScreen(
+                                    book = book,
+                                    onBack = { currentScreen = "home" }
+                                )
+                            }
                         }
                     }
                 }
