@@ -36,10 +36,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 @Composable
 fun BookDetailsScreen(
     book: Book,
@@ -62,13 +65,14 @@ fun BookDetailsScreen(
             .fillMaxSize()
             .background(Paper)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 40.dp, bottom = 36.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             //At the top
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextButton(
@@ -147,7 +151,7 @@ fun BookDetailsScreen(
                 color = TextMuted,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             //two chips, one function
             //Reuse function DetailsChip
             Row(
@@ -155,7 +159,37 @@ fun BookDetailsScreen(
             ) {
                 DetailsChip(text = book.year.toString())//call fun and pass year
                 DetailsChip(text = book.category)//call it again and pass category
-            }
+          }
+                Spacer(Modifier.height(28.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth() //To fits all different devices screens
+                        .shadow(3.dp, RoundedCornerShape(22.dp))
+                        .clip(RoundedCornerShape(22.dp))
+                        .background(PureWhite)
+                        .padding(22.dp)
+                ) {
+                    Text(
+                        text = "About this book",
+                        fontFamily = FrauncesFont,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 21.sp,
+                        color = Coffee
+                    )
+
+                    Spacer(Modifier.height(14.dp))
+
+                    Text(
+                        text = book.description,
+                        fontFamily = CairoFont,
+                        fontSize = 15.sp,
+                        lineHeight = 28.sp,
+                        color = TextSoft,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
         }
     }
 }
