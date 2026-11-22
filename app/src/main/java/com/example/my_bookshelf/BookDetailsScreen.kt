@@ -116,6 +116,8 @@ fun BookDetailsScreen(
                         .background(SpineShade)
                 )
             }
+            //Book title and author name
+            
         }
     }
 }
