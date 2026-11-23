@@ -30,19 +30,25 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
-            //Change 1
-            //save the selected book
-            var selectedBook by remember { mutableStateOf<Book?>(null) }
 
-            // Temporary navigation until Shaden adds BookDetailsScreen
-            BackHandler(
-                enabled = currentScreen == "signup"
-            ) {
+            // Save the selected book
+            var selectedBook by remember {
+                mutableStateOf<Book?>(null)
+            }
+
+            // Back from Sign Up to Login
+            BackHandler(enabled = currentScreen == "signup") {
                 currentScreen = "login"
             }
-            //Back from Details to Home screen
+
+            // Back from Details to Home
             BackHandler(enabled = currentScreen == "details") {
                 currentScreen = "home"
+            }
+
+            // Back from Edit to Details
+            BackHandler(enabled = currentScreen == "edit") {
+                currentScreen = "details"
             }
 
             My_BookshelfTheme {
@@ -112,11 +118,40 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        // BOOK DETAILS
                         "details" -> {
                             selectedBook?.let { book ->
+
                                 BookDetailsScreen(
                                     book = book,
-                                    onBack = { currentScreen = "home" }
+
+                                    onBack = {
+                                        currentScreen = "home"
+                                    },
+
+                                    onEdit = {
+                                        currentScreen = "edit"
+                                    }
+                                )
+                            }
+                        }
+
+                        // EDIT BOOK
+                        "edit" -> {
+                            selectedBook?.let { book ->
+
+                                EditBookScreen(
+                                    book = book,
+
+                                    onSave = { updatedBook ->
+                                        selectedBook = updatedBook
+                                        currentScreen = "details"
+                                    },
+
+                                    onCancel = {
+                                        currentScreen = "details"
+                                    }
                                 )
                             }
                         }
