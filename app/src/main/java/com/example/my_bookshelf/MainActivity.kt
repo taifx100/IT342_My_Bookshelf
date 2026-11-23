@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
             //save the selected book
             var selectedBook by remember { mutableStateOf<Book?>(null) }
 
+            // Temporary navigation until Shaden adds BookDetailsScreen
             BackHandler(
                 enabled = currentScreen == "signup"
             ) {
