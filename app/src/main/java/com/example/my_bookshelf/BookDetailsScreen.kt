@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.my_bookshelf.ui.theme.*
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun BookDetailsScreen(
@@ -59,7 +60,7 @@ fun BookDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
+                //.padding(horizontal = 24.dp)
                 .padding(top = 40.dp, bottom = 36.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -70,21 +71,21 @@ fun BookDetailsScreen(
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
                     Text(
-                        text = "< Back",
+                        text = "<",
                         fontFamily = DMSansFont,
-                        fontSize = 15.sp,
+                        fontSize = 20.sp,
                         color = LinkBrown
                     )
                 }
 
-                Text(
-                    text = "Book details",
-                    fontFamily = FrauncesFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = Coffee,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+//                Text(
+//                    text = "Book details",
+//                    fontFamily = FrauncesFont,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 20.sp,
+//                    color = Coffee,
+//                    modifier = Modifier.align(Alignment.Center)
+//                )
             }
 
             Spacer(Modifier.height(24.dp))
@@ -92,8 +93,8 @@ fun BookDetailsScreen(
             // Book cover box
             Box(
                 modifier = Modifier
-                    .width(200.dp)
-                    .height(265.dp)
+                    .width(160.dp)
+                    .height(200.dp)
                     .shadow(
                         elevation = 12.dp,
                         shape = RoundedCornerShape(16.dp)
@@ -138,50 +139,54 @@ fun BookDetailsScreen(
 
             Spacer(Modifier.height(25.dp))
 
-            // Book title
-            Text(
-                text = book.title,
-                fontFamily = AmiriFont,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-                lineHeight = 36.sp,
-                color = Coffee,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(Modifier.height(6.dp))
-
-            // Author name
-            Text(
-                text = book.author,
-                fontFamily = CairoFont,
-                fontSize = 15.sp,
-                color = TextMuted,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Two chips, one function
-            // DetailsChip is reused for year and category
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                DetailsChip(text = book.year.toString())
-                DetailsChip(text = book.category)
-            }
-
-            Spacer(Modifier.height(28.dp))
 
             // "About this book" card
             Column(
                 modifier = Modifier
                     .fillMaxWidth() // to fit all different device screens
-                    .shadow(3.dp, RoundedCornerShape(22.dp))
-                    .clip(RoundedCornerShape(22.dp))
+                    .shadow(3.dp, RoundedCornerShape(30.dp))
+                    .clip(RoundedCornerShape(30.dp))
                     .background(PureWhite)
-                    .padding(22.dp)
+                    .padding(60.dp)
             ) {
+                // Book title
+                Text(
+                    text = book.title,
+                    fontFamily = AmiriFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp,
+                    lineHeight = 36.sp,
+                    color = Coffee,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                // Author name
+                Text(
+                    text = book.author,
+                    fontFamily = CairoFont,
+                    fontSize = 15.sp,
+                    color = TextMuted,
+                    textAlign = TextAlign.Center
+                )
+                DetailsChip(text = book.year.toString(), backgroundColor = LatteLight, WarmBrown)
+
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "Category",
+                    fontFamily = FrauncesFont,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 21.sp,
+                    color = Coffee
+                )
+                // Two chips, one function
+                // DetailsChip is reused for year and category
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    DetailsChip(text = book.category, backgroundColor = TreeGreen, textColor = PureWhite )
+                }
                 Text(
                     text = "About this book",
                     fontFamily = FrauncesFont,
@@ -201,49 +206,53 @@ fun BookDetailsScreen(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(Modifier.height(24.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                )
+                {    // Edit button
+                    Button(
+                        onClick = onEdit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MochaDark,
+                            contentColor = PureWhite
+                        )
+                    ) {
+                        Text(
+                            text = "✎ Edit",
+                            fontFamily = DMSansFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Delete button
+                    OutlinedButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(2.dp, ErrorRed),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed)
+                    ) {
+                        Text(
+                            text = "🗑️ Delete",
+                            fontFamily = DMSansFont,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
             }
 
-            Spacer(Modifier.height(24.dp))
-
-            // Edit button
-            Button(
-                onClick = onEdit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MochaDark,
-                    contentColor = PureWhite
-                )
-            ) {
-                Text(
-                    text = "Edit book",
-                    fontFamily = DMSansFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
-                )
             }
 
-            Spacer(Modifier.height(12.dp))
-
-            // Delete button
-            OutlinedButton(
-                onClick = { showDeleteDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(18.dp),
-                border = BorderStroke(1.dp, ErrorRed),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed)
-            ) {
-                Text(
-                    text = "Delete book",
-                    fontFamily = DMSansFont,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
-                )
-            }
         }
     }
 
@@ -280,22 +289,24 @@ fun BookDetailsScreen(
 }
 
 @Composable
-private fun DetailsChip(text: String) {
+private fun DetailsChip(text: String, backgroundColor: Color, textColor: Color) {
+
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(ChipBackground)
-            .padding(horizontal = 14.dp, vertical = 7.dp)
+            .background(backgroundColor)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
             text = text,
             fontFamily = CairoFont,
-            fontSize = 12.sp,
-            color = LinkBrown
+            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp,
+            color = textColor,
+
         )
     }
 }
-
 // Preview (private so it won't mess up the other screens' previews)
 @Preview(showBackground = true)
 @Composable
