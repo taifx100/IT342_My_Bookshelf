@@ -35,7 +35,15 @@ class MainActivity : ComponentActivity() {
             var selectedBook by remember {
                 mutableStateOf<Book?>(null)
             }
-
+            val books = remember {
+                mutableStateListOf<Book>().apply {
+                    addAll(initialBooks)
+                }
+            }
+            // Back from Add Book to Home
+            BackHandler(enabled = currentScreen == "addBook") {
+                currentScreen = "home"
+            }
             // Back from Sign Up to Login
             BackHandler(enabled = currentScreen == "signup") {
                 currentScreen = "login"
@@ -98,18 +106,14 @@ class MainActivity : ComponentActivity() {
 
                             HomeScreen(
                                 userName = userName,
-
+                                books = books,
                                 onBookClick = { book ->
                                     selectedBook = book
                                     currentScreen = "details"
                                 },
 
                                 onAddBookClick = {
-                                    Toast.makeText(
-                                        this@MainActivity,
-                                        "Add Book page is coming soon!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    currentScreen = "addBook"
                                 },
 
                                 onSignOut = {
@@ -118,7 +122,18 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-
+// ADD NEW BOOK
+                        "addBook" -> {
+                            AddNewBookScreen(
+                                onSave = { book ->
+                                    books.add(book)
+                                    currentScreen = "home"
+                                },
+                                onCancel = {
+                                    currentScreen = "home"
+                                }
+                            )
+                        }
                         // BOOK DETAILS
                         "details" -> {
                             selectedBook?.let { book ->

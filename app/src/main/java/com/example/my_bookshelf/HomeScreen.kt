@@ -32,7 +32,8 @@ fun HomeScreen(
     userName: String,
     onBookClick: (Book) -> Unit,
     onAddBookClick: () -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    books: List<Book> = initialBooks
 ) {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
@@ -125,7 +126,7 @@ fun HomeScreen(
                         .padding(horizontal = 14.dp, vertical = 5.dp)
                 ) {
                     Text(
-                        text = "${initialBooks.size} books",
+                        text = "${books.size} books",
                         fontFamily = DMSansFont,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
@@ -143,7 +144,7 @@ fun HomeScreen(
                 contentPadding = PaddingValues(bottom = 85.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(initialBooks) { book ->
+                items(books) { book ->
                     ShelfBookItem(
                         book = book,
                         onClick = { onBookClick(book) }
