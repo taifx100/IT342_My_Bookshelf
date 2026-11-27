@@ -123,10 +123,8 @@ Firebase security rules ensure that each user can only access and manage their o
 
 <div align="center">
 
-### 🤎 Every book belongs somewhere.
+### 🤎 Every book belongs somewhere 🤎
 
-*For the love of books, stories, and little moments of discovery.*
-
-**Designed with care · Built with Kotlin · Powered by Firebase**
+**Designed for readers · Built with Kotlin · Powered by Firebase**
 
 </div>
