@@ -1,37 +1,50 @@
-# 📚 My Bookshelf
+<div align="center">
 
-### Your personal space for books, stories, and discoveries.
+# 📖 My Bookshelf
 
-My Bookshelf is a native Android application designed to help readers build and manage their own personal digital library. Built with Kotlin, Jetpack Compose, and Firebase, the app combines a warm, elegant design with real-time cloud data management.
+### A little space for every story worth keeping.
 
-## ✨ Features
+Your personal digital bookshelf, where every book has a place.
 
-- Secure user registration and login.
-- A private, personalized bookshelf for each user.
-- Three default books to start your reading journey.
-- Add, view, edit, and delete books (CRUD operations).
-- Customizable book covers with five color themes.
-- Detailed book information, including title, author, publication year, category, and description.
-- Real-time data synchronization with Cloud Firestore.
-- Input validation and deletion confirmation.
-- A warm and elegant user interface inspired by the cozy atmosphere of bookshelves.
+![Kotlin](https://img.shields.io/badge/Kotlin-8B6F47?style=for-the-badge&logo=kotlin&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-A68A64?style=for-the-badge&logo=jetpackcompose&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-C4A484?style=for-the-badge&logo=firebase&logoColor=white)
+![Android](https://img.shields.io/badge/Android-6B705C?style=for-the-badge&logo=android&logoColor=white)
 
-## 🛠️ Technologies Used
+</div>
 
-![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
-![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Android Studio](https://img.shields.io/badge/Android_Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)
+---
 
-- **Kotlin:** Application development.
-- **Jetpack Compose:** Modern Android user interface.
-- **Firebase Authentication:** Secure user authentication.
-- **Cloud Firestore:** Cloud storage and real-time CRUD operations.
-- **Android Studio:** Development environment.
+## ☕ About the Project
 
-## ☁️ Database Structure
+**My Bookshelf** is a native Android application that allows users to create, organize, and manage their own personal book collections.
 
-Each authenticated user has an independent bookshelf stored in Cloud Firestore.
+Built with Kotlin, Jetpack Compose, and Firebase, the application combines a cozy, book-inspired design with secure authentication and real-time cloud storage.
+
+## ✦ Features
+
+- **Personal Bookshelf** — An independent book collection for every user.
+- **User Authentication** — Secure registration and login.
+- **Book Management** — Add, view, edit, and delete books.
+- **Custom Book Covers** — Five beautiful cover color options.
+- **Book Details** — Title, author, publication year, category, and description.
+- **Default Collection** — Three books to begin your personal library.
+- **Cloud Synchronization** — Real-time updates and persistent data storage.
+- **Input Validation** — Clear error messages and deletion confirmation.
+
+## ✦ Technologies
+
+| Technology | Purpose |
+| :--- | :--- |
+| Kotlin | Android application development |
+| Jetpack Compose | User interface and design |
+| Firebase Authentication | User registration and login |
+| Cloud Firestore | Cloud storage and CRUD operations |
+| Android Studio | Development environment |
+
+## ✦ Database Structure
+
+Each user has a private bookshelf stored in Cloud Firestore, with real-time synchronization and secure access.
 
     users
     └── userId
@@ -49,17 +62,25 @@ Each authenticated user has an independent bookshelf stored in Cloud Firestore.
                 ├── coverUrl
                 └── createdAt
 
-Firebase security rules ensure that users can only access and manage their own books.
+Firebase security rules ensure that each user can only access and manage their own collection.
 
-## 🎓 Academic Project
+## ✦ Academic Information
 
-Developed as a group project for:
-
-- **Course:** Mobile Cloud Computing
-- **Course Code:** IT342
-- **Major:** Information Technology
-- **Year:** 2026
+| | |
+| :--- | :--- |
+| **Project** | My Bookshelf |
+| **Course** | Mobile Cloud Computing |
+| **Course Code** | IT342 |
+| **Major** | Information Technology |
+| **Year** | 2026 |
+| **Project Type** | Group Project |
 
 ---
 
-🤎 A little space for every story worth keeping.
+<div align="center">
+
+### Every book belongs somewhere🤎
+
+*Designed for readers. Built with Kotlin. Powered by Firebase.*
+
+</div>
