@@ -156,16 +156,32 @@ fun AddNewBookScreen(
             BookFormButton(
                 text = "Save book",
                 onClick = {
-                    val parsedYear = year.trim().toIntOrNull()
 
-                    if (
-                        title.isBlank() ||
-                        author.isBlank() ||
-                        parsedYear == null ||
-                        parsedYear <= 0
-                    ) {
-                        error = "Enter a title, author and valid publication year."
+                    // Remove invisible formatting characters from the year
+                    val cleanYear = year
+                        .filterNot { it.category == CharCategory.FORMAT }
+                        .trim()
+
+                    val parsedYear = cleanYear.toIntOrNull()
+
+                    // Validate each required field separately
+                    if (title.isBlank()) {
+
+                        error = "Please enter the book title."
+
+                    } else if (author.isBlank()) {
+
+                        error = "Please enter the author name."
+
+                    } else if (parsedYear == null || parsedYear <= 0) {
+
+                        error = "Please enter a valid publication year."
+
                     } else {
+
+                        // Clear the previous validation error
+                        error = ""
+
                         onSave(
                             Book(
                                 id = UUID.randomUUID().toString(),
@@ -244,7 +260,8 @@ fun CoverPickerRow(
     val coverColors = coverGradientColors(coverColor)
     val titleColor = coverTitleColor(coverColor)
     val coverShape = RoundedCornerShape(
-        topStart = 14.dp, topEnd = 6.dp, bottomEnd = 6.dp, bottomStart = 14.dp
+        topStart = 14.dp, topEnd = 6.dp,
+        bottomEnd = 6.dp, bottomStart = 14.dp
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -354,7 +371,11 @@ fun BookFormButton(text: String, onClick: () -> Unit) {
             .height(54.dp)
             .shadow(6.dp, shape)
             .clip(shape)
-            .background(Brush.linearGradient(listOf(MochaLight, MochaDark)))
+            .background(
+                Brush.linearGradient(
+                    listOf(MochaLight, MochaDark)
+                )
+            )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -432,7 +453,8 @@ fun AddBookField(
                     horizontal = 14.dp,
                     vertical = if (multiline) 12.dp else 0.dp
                 ),
-            contentAlignment = if (multiline) Alignment.TopStart else Alignment.CenterStart
+            contentAlignment = if (multiline)
+                Alignment.TopStart else Alignment.CenterStart
         ) {
             if (value.isEmpty()) {
                 Text(
@@ -455,7 +477,8 @@ fun AddBookField(
                 ),
                 cursorBrush = SolidColor(MochaDark),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = if (numeric) KeyboardType.Number else KeyboardType.Text
+                    keyboardType = if (numeric)
+                        KeyboardType.Number else KeyboardType.Text
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

@@ -10,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.my_bookshelf.ui.theme.My_BookshelfTheme
+import com.google.firebase.firestore.ListenerRegistration
 
 class MainActivity : ComponentActivity() {
 
@@ -20,6 +22,13 @@ class MainActivity : ComponentActivity() {
         val repository = AuthRepository()
 
         setContent {
+
+            val context = LocalContext.current
+
+            // Shows a short error message
+            fun showMessage(message: String) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
 
             var currentScreen by remember {
                 mutableStateOf(
@@ -36,9 +45,63 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf<Book?>(null)
             }
 
-            val books = remember {
-                mutableStateListOf<Book>().apply {
-                    addAll(initialBooks)
+            // The books of the current user, they come from Firestore
+            var books by remember {
+                mutableStateOf<List<Book>>(emptyList())
+            }
+
+            // true while a save / update / delete is running (blocks repeated clicks)
+            var isBusy by remember {
+                mutableStateOf(false)
+            }
+
+            // Only the signed-in user has an id (login and signup screens have none)
+            val userId =
+                if (currentScreen == "login" || currentScreen == "signup") {
+                    null
+                } else {
+                    repository.getCurrentUser()?.uid
+                }
+
+            // One repository per user
+            val bookRepository = remember(userId) {
+                userId?.let { BookRepository(it) }
+            }
+
+            // Starts the real-time listener for this user and stops it
+            // when the user signs out or a different user signs in.
+            DisposableEffect(userId) {
+
+                // Never show books (or a selected book) of a previous session
+                books = emptyList()
+                selectedBook = null
+
+                var registration: ListenerRegistration? = null
+
+                if (bookRepository != null) {
+
+                    // Adds the 3 initial books only once for this user
+                    bookRepository.initializeBooksIfNeeded { success, message ->
+                        if (!success) showMessage(message)
+                    }
+
+                    registration = bookRepository.listenToBooks(
+                        onBooks = { list ->
+                            books = list
+
+                            // Keep the open book up to date
+                            selectedBook = selectedBook?.let { current ->
+                                list.firstOrNull { it.id == current.id } ?: current
+                            }
+                        },
+                        onError = { message ->
+                            showMessage(message)
+                        }
+                    )
+                }
+
+                onDispose {
+                    registration?.remove()
                 }
             }
 
@@ -122,6 +185,12 @@ class MainActivity : ComponentActivity() {
 
                                 onSignOut = {
                                     repository.signOut()
+
+                                    // Clear the session data
+                                    books = emptyList()
+                                    selectedBook = null
+                                    isBusy = false
+
                                     currentScreen = "login"
                                 }
                             )
@@ -131,8 +200,22 @@ class MainActivity : ComponentActivity() {
                         "addBook" -> {
                             AddNewBookScreen(
                                 onSave = { book ->
-                                    books.add(book)
-                                    currentScreen = "home"
+                                    if (!isBusy && bookRepository != null) {
+                                        isBusy = true
+
+                                        // Go to Home only after Firestore confirms the save
+                                        bookRepository.addBook(book) { success, message ->
+                                            isBusy = false
+
+                                            if (success) {
+                                                if (currentScreen == "addBook") {
+                                                    currentScreen = "home"
+                                                }
+                                            } else {
+                                                showMessage(message)
+                                            }
+                                        }
+                                    }
                                 },
                                 onCancel = {
                                     currentScreen = "home"
@@ -156,9 +239,21 @@ class MainActivity : ComponentActivity() {
                                     },
 
                                     onDelete = {
-                                        books.removeAll { it.id == book.id }
-                                        selectedBook = null
-                                        currentScreen = "home"
+                                        if (!isBusy && bookRepository != null) {
+                                            isBusy = true
+
+                                            // Go to Home only after Firestore confirms the delete
+                                            bookRepository.deleteBook(book.id) { success, message ->
+                                                isBusy = false
+
+                                                if (success) {
+                                                    selectedBook = null
+                                                    currentScreen = "home"
+                                                } else {
+                                                    showMessage(message)
+                                                }
+                                            }
+                                        }
                                     }
                                 )
                             }
@@ -172,17 +267,24 @@ class MainActivity : ComponentActivity() {
                                     book = book,
 
                                     onSave = { updatedBook ->
+                                        if (!isBusy && bookRepository != null) {
+                                            isBusy = true
 
-                                        val index = books.indexOfFirst {
-                                            it.id == updatedBook.id
+                                            // Go back to Details only after Firestore confirms the update
+                                            bookRepository.updateBook(updatedBook) { success, message ->
+                                                isBusy = false
+
+                                                if (success) {
+                                                    selectedBook = updatedBook
+
+                                                    if (currentScreen == "edit") {
+                                                        currentScreen = "details"
+                                                    }
+                                                } else {
+                                                    showMessage(message)
+                                                }
+                                            }
                                         }
-
-                                        if (index != -1) {
-                                            books[index] = updatedBook
-                                        }
-
-                                        selectedBook = updatedBook
-                                        currentScreen = "details"
                                     },
 
                                     onCancel = {
