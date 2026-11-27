@@ -35,15 +35,18 @@ class MainActivity : ComponentActivity() {
             var selectedBook by remember {
                 mutableStateOf<Book?>(null)
             }
+
             val books = remember {
                 mutableStateListOf<Book>().apply {
                     addAll(initialBooks)
                 }
             }
+
             // Back from Add Book to Home
             BackHandler(enabled = currentScreen == "addBook") {
                 currentScreen = "home"
             }
+
             // Back from Sign Up to Login
             BackHandler(enabled = currentScreen == "signup") {
                 currentScreen = "login"
@@ -107,6 +110,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 userName = userName,
                                 books = books,
+
                                 onBookClick = { book ->
                                     selectedBook = book
                                     currentScreen = "details"
@@ -122,7 +126,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-// ADD NEW BOOK
+
+                        // ADD NEW BOOK
                         "addBook" -> {
                             AddNewBookScreen(
                                 onSave = { book ->
@@ -134,6 +139,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
                         // BOOK DETAILS
                         "details" -> {
                             selectedBook?.let { book ->
@@ -147,6 +153,12 @@ class MainActivity : ComponentActivity() {
 
                                     onEdit = {
                                         currentScreen = "edit"
+                                    },
+
+                                    onDelete = {
+                                        books.removeAll { it.id == book.id }
+                                        selectedBook = null
+                                        currentScreen = "home"
                                     }
                                 )
                             }
@@ -160,6 +172,15 @@ class MainActivity : ComponentActivity() {
                                     book = book,
 
                                     onSave = { updatedBook ->
+
+                                        val index = books.indexOfFirst {
+                                            it.id == updatedBook.id
+                                        }
+
+                                        if (index != -1) {
+                                            books[index] = updatedBook
+                                        }
+
                                         selectedBook = updatedBook
                                         currentScreen = "details"
                                     },

@@ -15,10 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -141,7 +144,7 @@ fun HomeScreen(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(22.dp),
-                contentPadding = PaddingValues(bottom = 85.dp),
+                contentPadding = PaddingValues(bottom = 90.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 items(books) { book ->
@@ -163,7 +166,7 @@ fun HomeScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(52.dp)
+                .height(64.dp)
         )
     }
 }
@@ -173,14 +176,10 @@ private fun ShelfBookItem(
     book: Book,
     onClick: () -> Unit
 ) {
-    val coverColors = when (book.coverColor) {
-        "sand" -> listOf(CoverSandLight, CoverSand)
-        "navy" -> listOf(CoverNavyLight, CoverNavy)
-        else -> listOf(CoverSageLight, CoverSage)
-    }
+    // Colors come from the shared cover helpers (bottom of this file)
+    val coverColors = coverGradientColors(book.coverColor)
 
-    val titleColor =
-        if (book.coverColor == "sand") Coffee else PureWhite
+    val titleColor = coverTitleColor(book.coverColor)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -286,8 +285,9 @@ private fun ShelfBookItem(
     }
 }
 
+// Public (was private) so Add / Edit / Details draw the same cover drawings
 @Composable
-private fun CoverDecoration(
+fun CoverDecoration(
     coverType: String,
     modifier: Modifier = Modifier
 ) {
@@ -340,7 +340,71 @@ private fun CoverDecoration(
                 }
             }
 
+            "wine" -> {
+                // Rose: six petals, a center and a stem
+                val c = Offset(w * 0.5f, h * 0.4f)
+                val dist = h * 0.15f
+
+                for (i in 0 until 6) {
+                    val angle = Math.toRadians(i * 60.0 - 90.0)
+                    drawCircle(
+                        color = PetalPink.copy(alpha = 0.9f),
+                        radius = h * 0.12f,
+                        center = Offset(
+                            c.x + (dist * Math.cos(angle)).toFloat(),
+                            c.y + (dist * Math.sin(angle)).toFloat()
+                        )
+                    )
+                }
+
+                drawCircle(color = CoverWineLight, radius = h * 0.11f, center = c)
+                drawCircle(color = PetalPink, radius = h * 0.05f, center = c)
+
+                drawLine(
+                    color = HillsGreen,
+                    start = Offset(w * 0.5f, h * 0.6f),
+                    end = Offset(w * 0.5f, h * 0.82f),
+                    strokeWidth = 3.dp.toPx(),
+                    cap = StrokeCap.Round
+                )
+            }
+
+            "mocha" -> {
+                // Coffee cup with steam
+                drawRoundRect(
+                    color = SunCream,
+                    topLeft = Offset(w * 0.34f, h * 0.42f),
+                    size = Size(w * 0.3f, h * 0.34f),
+                    cornerRadius = CornerRadius(h * 0.05f)
+                )
+
+                drawCircle(
+                    color = SunCream,
+                    radius = h * 0.085f,
+                    center = Offset(w * 0.66f, h * 0.56f),
+                    style = Stroke(width = 3.dp.toPx())
+                )
+
+                drawRoundRect(
+                    color = StarGold,
+                    topLeft = Offset(w * 0.28f, h * 0.78f),
+                    size = Size(w * 0.42f, h * 0.05f),
+                    cornerRadius = CornerRadius(h * 0.03f)
+                )
+
+                listOf(0.42f, 0.49f, 0.56f).forEach { x ->
+                    drawLine(
+                        color = SunCream.copy(alpha = 0.7f),
+                        start = Offset(w * x, h * 0.2f),
+                        end = Offset(w * x, h * 0.34f),
+                        strokeWidth = 2.dp.toPx(),
+                        cap = StrokeCap.Round
+                    )
+                }
+            }
+
             else -> {
+                // Sage: sun and green hills
                 drawCircle(
                     color = SunCream,
                     radius = h * 0.17f,
@@ -415,40 +479,83 @@ private fun AddBookTile(onClick: () -> Unit) {
 private fun MiniBooksDecoration(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         val colors = listOf(
-            TreeGreen, CoverSand, CoverNavy,
-            CoverWine, MochaDark, CoverSage,
-            Latte, Coffee, CoverNavyLight, MochaLight
+            CoverSageLight, CoverSand, CoverWineLight, SpineBrown,
+            SpineBlue, SpineGold, TreeGreen, MochaDark,
+            SpineAmber, CoverWine, CoverSage
         )
+        val bands = listOf(LatteLight, Coffee, StarGold)
+        val widths = listOf(28, 30, 26, 32, 24, 30, 26, 34, 26, 28, 24)
+        val heights = listOf(46, 58, 50, 62, 44, 56, 48, 60, 46, 54, 42)
+        val gap = 2.dp.toPx()
 
-        val bookWidth = size.width / colors.size
+        val totalWidth = widths.sumOf { it.dp.toPx().toDouble() }.toFloat() +
+                gap * (colors.size - 1)
+        var x = (size.width - totalWidth) / 2f
 
         colors.forEachIndexed { index, color ->
-            val heightFactor = 0.55f + (index % 4) * 0.12f
-            val bookHeight = size.height * heightFactor
+            val w = widths[index].dp.toPx()
+            val h = heights[index].dp.toPx()
+            val top = size.height - h
 
             drawRect(
                 color = color,
-                topLeft = Offset(
-                    index * bookWidth,
-                    size.height - bookHeight
-                ),
-                size = Size(
-                    bookWidth * 0.93f,
-                    bookHeight
-                )
+                topLeft = Offset(x, top),
+                size = Size(w, h)
             )
 
+            // decorative band near the top of each spine
             drawRect(
-                color = PureWhite.copy(alpha = 0.3f),
-                topLeft = Offset(
-                    index * bookWidth + bookWidth * 0.15f,
-                    size.height - bookHeight + 5.dp.toPx()
-                ),
-                size = Size(
-                    bookWidth * 0.08f,
-                    bookHeight * 0.5f
-                )
+                color = bands[index % bands.size],
+                topLeft = Offset(x, top + 8.dp.toPx()),
+                size = Size(w, 3.dp.toPx())
             )
+
+            x += w + gap
         }
     }
+}
+
+// ───────────── Shared cover helpers (used by Home, Details, Add, Edit) ─────────────
+
+// All cover color names, in the order shown in the Add picker
+val coverColorOptions = listOf("sand", "sage", "navy", "wine", "mocha")
+
+// Cover gradient (top, bottom)
+fun coverGradientColors(coverColor: String): List<Color> = when (coverColor) {
+    "sand" -> listOf(CoverSandLight, CoverSand)
+    "navy" -> listOf(CoverNavyLight, CoverNavy)
+    "wine" -> listOf(CoverWineLight, CoverWine)
+    "mocha" -> listOf(CoverMochaLight, CoverMocha)
+    else -> listOf(CoverSageLight, CoverSage)
+}
+
+// Title color that contrasts with the cover
+fun coverTitleColor(coverColor: String): Color =
+    if (coverColor == "sand") Coffee else PureWhite
+
+// Dot color in the color picker
+fun coverDotColor(coverColor: String): Color = when (coverColor) {
+    "sand" -> CoverSand
+    "navy" -> CoverNavy
+    "wine" -> CoverWine
+    "mocha" -> CoverMocha
+    else -> TreeGreen
+}
+
+// Readable name under the picker
+fun coverDisplayName(coverColor: String): String = when (coverColor) {
+    "sand" -> "Golden / Sand"
+    "navy" -> "Navy Blue"
+    "wine" -> "Burgundy / Wine"
+    "mocha" -> "Mocha Brown"
+    else -> "Sage Green"
+}
+
+// Light background gradient behind the cover in Book Details
+fun detailsBackgroundColors(coverColor: String): List<Color> = when (coverColor) {
+    "sand" -> listOf(DetailsGoldTop, DetailsGoldBottom)
+    "navy" -> listOf(DetailsNavyTop, DetailsNavyBottom)
+    "wine" -> listOf(DetailsWineTop, DetailsWineBottom)
+    "mocha" -> listOf(DetailsMochaTop, DetailsMochaBottom)
+    else -> listOf(DetailsSageTop, DetailsSageBottom)
 }

@@ -62,3 +62,30 @@ val MutedBrown = TextMuted
 val SoftBorder = FieldBorder
 val ErrorBrown = ErrorRed
 
+// Details / Add / Edit screens (Latte Library)
+val DetailsGoldTop = Color(0xFFE3C28A)
+val DetailsGoldBottom = Color(0xFFB98A4E)
+
+// Details background per cover color (light gradients)
+val DetailsNavyTop = Color(0xFFC3D5EA)
+val DetailsNavyBottom = Color(0xFF86A2C6)
+val DetailsSageTop = Color(0xFFD0DEBD)
+val DetailsSageBottom = Color(0xFF94AB7F)
+val DetailsWineTop = Color(0xFFF0CCD6)
+val DetailsWineBottom = Color(0xFFC0829A)
+val DetailsMochaTop = Color(0xFFEBD8C0)
+val DetailsMochaBottom = Color(0xFFB88F68)
+
+val SheetCream = Color(0xFFFFFDF9)
+val TextBody = Color(0xFF4A3A2D)
+val DeleteTint = Color(0xFFFFF1F0)
+val DeleteIconBg = Color(0xFFFBE4E0)
+
+// Small book spines at the bottom of Home
+val SpineBrown = Color(0xFF8B5E3C)
+val SpineBlue = Color(0xFF3E5470)
+val SpineGold = Color(0xFFE3BE7E)
+val SpineAmber = Color(0xFFC99A55)
+
+// Wine cover flower
+val PetalPink = Color(0xFFF2C6CF)
